@@ -28,14 +28,14 @@ apt-get install -y dnsmasq
 /bin/echo "Configuring eth1:"
 /bin/cat >> /etc/network/interfaces <<eth_config 
 ## ETH1 static ip
+auto eth1
 iface eth1 inet static
 address 192.168.0.1
 netmask 255.255.255.0
 
 eth_config
-sudo ifdown wlan1
-sudo ifup wlan1
-
+sudo ifdown eth1
+sudo ifup eth1
 
 /bin/echo "Configuring dhcp:"
 /bin/cat >> /etc/dnsmasq.conf <<dnsmasq_config 
@@ -83,7 +83,9 @@ ClientOnly
 tor_config
 
 /bin/echo "Ensuring Tor starts when system boots up:"
+/usr/sbin/update-rc.d dnsmasq enable
 /usr/sbin/update-rc.d tor enable
+
 
 /bin/echo "Starting the Tor service:"
 /usr/sbin/service tor start
