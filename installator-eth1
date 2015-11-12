@@ -2,9 +2,10 @@
 #Install Tor for Raspberry Pi and configure IP tables
 #Must be ran as ROOT 
 
-/bin/echo "Updating system and installing Tor:"
+/bin/echo "Updating system and installing dhcp and Tor:"
 #/usr/bin/apt-get -y update
 #/usr/bin/apt-get -y upgrade
+apt-get install -y dnsmasq
 /usr/bin/apt-get -y install tor 
 
 /bin/echo "Firewall settings:"
@@ -22,7 +23,32 @@
 /bin/chown debian-tor /var/log/tor/notices.log
 /bin/chmod 644 /var/log/tor/notices.log
 
-/bin/echo "Configuring Tor for Wifi access point:"
+
+
+/bin/echo "Configuring eth1:"
+/bin/cat >> /etc/network/interfaces <<eth_config 
+## ETH1 static ip
+iface eth1 inet static
+address 192.168.0.1
+netmask 255.255.255.0
+
+eth_config
+
+
+/bin/echo "Configuring dhcp:"
+/bin/cat >> /etc/dnsmasq.conf <<dnsmasq_config 
+interface=eth1
+dhcp-range=eth1,192.168.0.10,192.168.0.200,2h
+dhcp-option=3,192.168.0.1 # our router
+dhcp-option=6,192.168.0.1 # our DNS Server
+dhcp-authoritative # force clients to grab a new IP
+
+dnsmasq_config
+
+
+
+
+/bin/echo "Configuring Tor access from eth1:"
 /bin/cat >/etc/tor/torrc <<tor_config 
 ## ETH1 is workstation access
 ## Assumes you've configured your access point similar to LadyAda's "Pi as Access Point" tutorial
@@ -36,11 +62,11 @@ AutomapHostsOnResolve 1
 
 # Transparent Port
 TransPort 9040
-TransListenAddress 192.168.42.1
+TransListenAddress 192.168.0.1
 
 # DNS Port
 DNSPort 53
-DNSListenAddress 192.168.42.1
+DNSListenAddress 192.168.0.1
 
 ## Tor Relay Configuration
 
