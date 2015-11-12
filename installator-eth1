@@ -33,6 +33,8 @@ address 192.168.0.1
 netmask 255.255.255.0
 
 eth_config
+sudo ifdown wlan1
+sudo ifup wlan1
 
 
 /bin/echo "Configuring dhcp:"
