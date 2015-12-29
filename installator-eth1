@@ -27,9 +27,12 @@ apt-get install -y dnsmasq
 
 /bin/echo "Configuring eth1:"
 /bin/cat >> /etc/network/interfaces <<eth_config 
+
 ## ETH1 static ip
 auto eth1
+allow-hotplug eth1
 iface eth1 inet static
+pre-up iptables-restore < /etc/iptables.ipv4.nat
 address 192.168.0.1
 netmask 255.255.255.0
 
@@ -94,9 +97,11 @@ tor_config
 
 ifup eth0
 ifup eth1
-cat /var/log/tor/notices.log
+
 service tor restart
 service dnsmasq restart
+
+cat /var/log/tor/notices.log
 
 /bin/echo "Done!"
 
