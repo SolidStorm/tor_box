@@ -91,6 +91,13 @@ tor_config
 /usr/sbin/service tor start
 
 /usr/bin/clear
+
+ifup eth0
+ifup eth1
+cat /var/log/tor/notices.log
+service tor restart
+service dnsmasq restart
+
 /bin/echo "Done!"
 
 exit
